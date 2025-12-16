@@ -6,11 +6,11 @@
 #    By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/16 11:22:10 by lucinguy          #+#    #+#              #
-#    Updated: 2025/12/16 15:48:20 by lucinguy         ###   ########.fr        #
+#    Updated: 2025/12/16 16:53:58 by lucinguy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME    := pipex.a
+NAME    := pipex
 CC      := cc
 CFLAGS  := -Wall -Wextra -Werror
 AR      := ar rcs
