@@ -6,10 +6,11 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 18:05:38 by lucinguy          #+#    #+#             */
-/*   Updated: 2025/12/16 14:16:16 by lucinguy         ###   ########.fr       */
+/*   Updated: 2025/12/17 16:03:59 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft/libft.h"
 #include "pipex.h"
 
 void	child(char **argv, char **envp, int *fd)

@@ -6,10 +6,11 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2025/12/16 13:51:27 by lucinguy         ###   ########.fr       */
+/*   Updated: 2025/12/17 16:04:09 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft/libft.h"
 #include "pipex.h"
 
 char	*find_path(char *cmd, char **envp)
