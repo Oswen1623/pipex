@@ -6,24 +6,24 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2025/12/17 16:04:09 by lucinguy         ###   ########.fr       */
+/*   Updated: 2025/12/18 11:25:20 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "pipex.h"
 
-char	*find_path(char *cmd, char **envp)
+static void	free_paths(char **paths)
 {
-	char	**paths;
+	free_split(paths);
+}
+
+static char	*check_path(char **paths, char *cmd)
+{
+	char	*part_path;
 	char	*path;
 	int		i;
-	char	*part_path;
 
-	i = 0;
-	while (ft_strnstr(envp[i], "PATH", 4) == 0)
-		i++;
-	paths = ft_split(envp[i] + 5, ':');
 	i = 0;
 	while (paths[i])
 	{
@@ -35,11 +35,26 @@ char	*find_path(char *cmd, char **envp)
 		free(path);
 		i++;
 	}
-	i = -1;
-	while (paths[++i])
-		free(paths[i]);
-	free(paths);
-	return (0);
+	return (NULL);
+}
+
+char	*find_path(char *cmd, char **envp)
+{
+	char	**paths;
+	char	*path;
+	int		i;
+
+	if (access(cmd, F_OK) == 0)
+		return (ft_strdup(cmd));
+	i = 0;
+	while (envp[i] && ft_strnstr(envp[i], "PATH", 4) == 0)
+		i++;
+	if (!envp[i])
+		return (NULL);
+	paths = ft_split(envp[i] + 5, ':');
+	path = check_path(paths, cmd);
+	free_paths(paths);
+	return (path);
 }
 
 void	error(void)
@@ -51,46 +66,19 @@ void	error(void)
 void	execute(char *argv, char **envp)
 {
 	char	**cmd;
-	int		i;
 	char	*path;
 
-	i = -1;
 	cmd = ft_split(argv, ' ');
 	path = find_path(cmd[0], envp);
 	if (!path)
 	{
-		while (cmd[++i])
-			free(cmd[i]);
-		free(cmd);
+		free_split(cmd);
 		error();
 	}
 	if (execve(path, cmd, envp) == -1)
-		error();
-}
-
-int	get_next_line(char **line)
-{
-	char	*buffer;
-	int		i;
-	int		r;
-	char	c;
-
-	i = 0;
-	r = 0;
-	buffer = (char *)malloc(10000);
-	if (!buffer)
-		return (-1);
-	r = read(0, &c, 1);
-	while (r && c != '\n' && c != '\0')
 	{
-		if (c != '\n' && c != '\0')
-			buffer[i] = c;
-		i++;
-		r = read(0, &c, 1);
+		free_split(cmd);
+		free(path);
+		error();
 	}
-	buffer[i] = '\n';
-	buffer[++i] = '\0';
-	*line = buffer;
-	free(buffer);
-	return (r);
 }

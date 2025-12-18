@@ -16,12 +16,13 @@ CFLAGS  := -Wall -Wextra -Werror
 RM      := rm -f
 LIBFT_DIR := libft
 LIBFT   := $(LIBFT_DIR)/libft.a
-INCS    := -I./$(LIBFT_DIR)
+INCS    := -I. -I./$(LIBFT_DIR)
 
 # ----------------------------- Mandatory ----------------------------- #
 SRCS := \
     pipex.c \
-    utils.c
+    utils.c \
+    utils2.c
 
 OBJS := $(SRCS:.c=.o)
 
