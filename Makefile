@@ -1,4 +1,4 @@
-# **************************************************************************** #
+      # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
@@ -13,49 +13,39 @@
 NAME    := pipex
 CC      := cc
 CFLAGS  := -Wall -Wextra -Werror
-AR      := ar rcs
 RM      := rm -f
-
-INCS    := -I. -Ilibft
+LIBFT_DIR := libft
+LIBFT   := $(LIBFT_DIR)/libft.a
+INCS    := -I. -I./$(LIBFT_DIR)
 
 # ----------------------------- Mandatory ----------------------------- #
-
 SRCS := \
-	pipex.c \
-	utils.c
-
-# ----------------------------- Bonus ----------------------------- #
-
-BSRCS := \
+    pipex.c \
+    utils.c \
+    utils2.c
 
 OBJS := $(SRCS:.c=.o)
-BOBJS := $(BSRCS:.c=.o)
 
-LIBFT_DIR := libft
-LIBFT := $(LIBFT_DIR)/libft.a
-
-all: $(LIBFT) $(NAME)
+# ----------------------------- Rules ----------------------------- #
+all: $(NAME)
 
 $(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
+	$(MAKE) -C $(LIBFT_DIR) bonus
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -o pipex
-
-# bonus: $(LIBFT) $(NAME) $(BOBJS)
-# 	$(AR) $(NAME) $(BOBJS)
+$(NAME): $(LIBFT) $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
 
 clean:
-	$(RM) $(OBJS) $(BOBJS)
+	$(RM) $(OBJS)
 	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	$(RM) $(NAME) pipex
+	$(RM) $(NAME)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
 
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re

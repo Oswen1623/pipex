@@ -6,24 +6,67 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/12/24 21:05:20 by lucinguy         ###   ########.fr       */
+=======
+/*   Updated: 2025/12/18 11:25:20 by lucinguy         ###   ########.fr       */
+>>>>>>> 49cac18407d5011f3af52f4f79eadefdbae62d6f
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft/libft.h"
 #include "pipex.h"
 
+<<<<<<< HEAD
 static char	*get_env_path(char **env)
 {
 	int	idx;
 
 	idx = 0;
 	while (env[idx])
+=======
+static void	free_paths(char **paths)
+{
+	free_split(paths);
+}
+
+static char	*check_path(char **paths, char *cmd)
+{
+	char	*part_path;
+	char	*path;
+	int		i;
+
+	i = 0;
+	while (paths[i])
+>>>>>>> 49cac18407d5011f3af52f4f79eadefdbae62d6f
 	{
 		if (ft_strncmp(env[idx], "PATH=", 5) == 0)
 			return (env[idx] + 5);
 		idx++;
 	}
 	return (NULL);
+<<<<<<< HEAD
+=======
+}
+
+char	*find_path(char *cmd, char **envp)
+{
+	char	**paths;
+	char	*path;
+	int		i;
+
+	if (access(cmd, F_OK) == 0)
+		return (ft_strdup(cmd));
+	i = 0;
+	while (envp[i] && ft_strnstr(envp[i], "PATH", 4) == 0)
+		i++;
+	if (!envp[i])
+		return (NULL);
+	paths = ft_split(envp[i] + 5, ':');
+	path = check_path(paths, cmd);
+	free_paths(paths);
+	return (path);
+>>>>>>> 49cac18407d5011f3af52f4f79eadefdbae62d6f
 }
 
 static void	free_tab(char **tab)
@@ -78,6 +121,7 @@ void	msg_error(char *msg)
 
 void	run_cmd(char *arg, char **env)
 {
+<<<<<<< HEAD
 	char	**args;
 	char	*bin_path;
 
@@ -98,5 +142,22 @@ void	run_cmd(char *arg, char **env)
 		free(bin_path);
 		free_tab(args);
 		msg_error("execution failed");
+=======
+	char	**cmd;
+	char	*path;
+
+	cmd = ft_split(argv, ' ');
+	path = find_path(cmd[0], envp);
+	if (!path)
+	{
+		free_split(cmd);
+		error();
+	}
+	if (execve(path, cmd, envp) == -1)
+	{
+		free_split(cmd);
+		free(path);
+		error();
+>>>>>>> 49cac18407d5011f3af52f4f79eadefdbae62d6f
 	}
 }
