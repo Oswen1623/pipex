@@ -22,7 +22,7 @@ INCS    := -I. -I./$(LIBFT_DIR)
 SRCS := \
     pipex.c \
     utils.c \
-    utils2.c
+    exec.c
 
 OBJS := $(SRCS:.c=.o)
 

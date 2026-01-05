@@ -1,28 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils2.c                                           :+:      :+:    :+:   */
+/*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/18 15:20:00 by lucinguy          #+#    #+#             */
-/*   Updated: 2025/12/18 15:13:31 by lucinguy         ###   ########.fr       */
+/*   Created: 2026/01/05 18:00:00 by lucinguy          #+#    #+#             */
+/*   Updated: 2026/01/05 18:03:31 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	free_split(char **split)
+void	exec_cmd(char *arg, char **envp)
 {
-	int	i;
+	char	**cmd;
+	char	*path;
 
-	i = 0;
-	if (!split)
-		return ;
-	while (split[i])
+	cmd = ft_split(arg, ' ');
+	if (!cmd || !cmd[0])
 	{
-		free(split[i]);
-		i++;
+		free_arr(cmd);
+		ft_putstr_fd("Error: empty command\n", 2);
+		exit(1);
 	}
-	free(split);
+	path = get_path(cmd[0], envp);
+	if (!path)
+	{
+		free_arr(cmd);
+		ft_putstr_fd("Error: command not found\n", 2);
+		exit(127);
+	}
+	execve(path, cmd, envp);
+	free(path);
+	free_arr(cmd);
+	ft_error("execve");
 }
