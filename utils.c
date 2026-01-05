@@ -6,90 +6,97 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2025/12/16 13:51:27 by lucinguy         ###   ########.fr       */
+/*   Updated: 2025/12/24 21:05:20 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*find_path(char *cmd, char **envp)
+static char	*get_env_path(char **env)
 {
-	char	**paths;
-	char	*path;
-	int		i;
-	char	*part_path;
+	int	idx;
 
-	i = 0;
-	while (ft_strnstr(envp[i], "PATH", 4) == 0)
-		i++;
-	paths = ft_split(envp[i] + 5, ':');
-	i = 0;
-	while (paths[i])
+	idx = 0;
+	while (env[idx])
 	{
-		part_path = ft_strjoin(paths[i], "/");
-		path = ft_strjoin(part_path, cmd);
-		free(part_path);
-		if (access(path, F_OK) == 0)
-			return (path);
-		free(path);
-		i++;
+		if (ft_strncmp(env[idx], "PATH=", 5) == 0)
+			return (env[idx] + 5);
+		idx++;
 	}
-	i = -1;
-	while (paths[++i])
-		free(paths[i]);
-	free(paths);
-	return (0);
+	return (NULL);
 }
 
-void	error(void)
+static void	free_tab(char **tab)
 {
-	perror("Error");
+	int	i;
+
+	i = 0;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	free(tab);
+}
+
+static char	*resolve_cmd_path(char *cmd, char **env)
+{
+	char	**dirs;
+	char	*full_path;
+	char	*tmp;
+	int		i;
+
+	if (access(cmd, X_OK) == 0)
+		return (ft_strdup(cmd));
+	if (!get_env_path(env))
+		return (NULL);
+	dirs = ft_split(get_env_path(env), ':');
+	i = -1;
+	while (dirs[++i])
+	{
+		tmp = ft_strjoin(dirs[i], "/");
+		full_path = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (access(full_path, X_OK) == 0)
+		{
+			free_tab(dirs);
+			return (full_path);
+		}
+		free(full_path);
+	}
+	free_tab(dirs);
+	return (NULL);
+}
+
+void	msg_error(char *msg)
+{
+	ft_putstr_fd("pipex: ", 2);
+	ft_putstr_fd(msg, 2);
+	ft_putstr_fd("\n", 2);
 	exit(EXIT_FAILURE);
 }
 
-void	execute(char *argv, char **envp)
+void	run_cmd(char *arg, char **env)
 {
-	char	**cmd;
-	int		i;
-	char	*path;
+	char	**args;
+	char	*bin_path;
 
-	i = -1;
-	cmd = ft_split(argv, ' ');
-	path = find_path(cmd[0], envp);
-	if (!path)
+	args = ft_split(arg, ' ');
+	if (!args || !args[0])
 	{
-		while (cmd[++i])
-			free(cmd[i]);
-		free(cmd);
-		error();
+		free_tab(args);
+		msg_error("empty command");
 	}
-	if (execve(path, cmd, envp) == -1)
-		error();
-}
-
-int	get_next_line(char **line)
-{
-	char	*buffer;
-	int		i;
-	int		r;
-	char	c;
-
-	i = 0;
-	r = 0;
-	buffer = (char *)malloc(10000);
-	if (!buffer)
-		return (-1);
-	r = read(0, &c, 1);
-	while (r && c != '\n' && c != '\0')
+	bin_path = resolve_cmd_path(args[0], env);
+	if (!bin_path)
 	{
-		if (c != '\n' && c != '\0')
-			buffer[i] = c;
-		i++;
-		r = read(0, &c, 1);
+		free_tab(args);
+		msg_error("command not found");
 	}
-	buffer[i] = '\n';
-	buffer[++i] = '\0';
-	*line = buffer;
-	free(buffer);
-	return (r);
+	if (execve(bin_path, args, env) == -1)
+	{
+		free(bin_path);
+		free_tab(args);
+		msg_error("execution failed");
+	}
 }
