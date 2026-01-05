@@ -6,62 +6,62 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/05 18:03:31 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/05 22:46:52 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	free_arr(char **arr)
+void	free_strs(char **strs)
 {
 	int	i;
 
-	if (!arr)
+	if (!strs)
 		return ;
 	i = -1;
-	while (arr[++i])
-		free(arr[i]);
-	free(arr);
+	while (strs[++i])
+		free(strs[i]);
+	free(strs);
 }
 
-void	ft_error(char *str)
+void	exit_error(char *s)
 {
-	perror(str);
+	perror(s);
 	exit(1);
 }
 
-static char	*try_path(char **paths, char *cmd)
+static char	*check_cmd(char **dirs, char *name)
 {
-	char	*dir;
-	char	*full;
+	char	*tmp;
+	char	*bin;
 	int		i;
 
 	i = -1;
-	while (paths[++i])
+	while (dirs[++i])
 	{
-		dir = ft_strjoin(paths[i], "/");
-		full = ft_strjoin(dir, cmd);
-		free(dir);
-		if (access(full, F_OK) == 0)
-			return (full);
-		free(full);
+		tmp = ft_strjoin(dirs[i], "/");
+		bin = ft_strjoin(tmp, name);
+		free(tmp);
+		if (access(bin, F_OK) == 0)
+			return (bin);
+		free(bin);
 	}
 	return (NULL);
 }
 
-char	*get_path(char *cmd, char **envp)
+char	*find_bin(char *name, char **env)
 {
-	char	**paths;
-	char	*result;
+	char	**dirs;
+	char	*bin;
 	int		i;
 
 	i = 0;
-	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
+	while (env[i] && ft_strncmp(env[i], "PATH=", 5) != 0)
 		i++;
-	if (!envp[i])
+	if (!env[i])
 		return (NULL);
-	paths = ft_split(envp[i] + 5, ':');
-	result = try_path(paths, cmd);
-	free_arr(paths);
-	return (result);
+	dirs = ft_split(env[i] + 5, ':');
+	bin = check_cmd(dirs, name);
+	free_strs(dirs);
+	return (bin);
 }
