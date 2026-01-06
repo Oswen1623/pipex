@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 18:00:00 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/05 22:46:52 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/06 16:36:48 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ void	run_command(char *arg, char **env)
 		ft_putstr_fd("Error: empty command\n", 2);
 		exit(1);
 	}
-	bin = find_bin(args[0], env);
+	if (ft_strchr(args[0], '/'))
+		bin = ft_strdup(args[0]);
+	else
+		bin = find_bin(args[0], env);
 	if (!bin)
 	{
 		free_strs(args);

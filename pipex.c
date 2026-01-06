@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 18:05:38 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/05 22:46:52 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/06 16:41:20 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ int	main(int ac, char **av, char **env)
 {
 	int		p[2];
 	pid_t	pid;
+	int		status;
 
 	if (ac != 5)
 	{
@@ -60,7 +61,8 @@ int	main(int ac, char **av, char **env)
 		exit_error("fork");
 	if (pid == 0)
 		do_child(av, env, p);
-	waitpid(pid, NULL, 0);
+	close(p[1]);
+	waitpid(pid, &status, 0);
 	do_parent(av, env, p);
 	return (0);
 }
