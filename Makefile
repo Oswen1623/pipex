@@ -20,9 +20,9 @@ INCS    := -I. -I./$(LIBFT_DIR)
 
 # ----------------------------- Mandatory ----------------------------- #
 SRCS := \
-    pipex.c \
-    utils.c \
-    exec.c
+	pipex.c \
+	utils.c \
+	exec.c
 
 OBJS := $(SRCS:.c=.o)
 
