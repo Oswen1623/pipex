@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/05 18:00:00 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/08 17:55:05 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/09 16:51:28 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,22 @@
 
 void	run_command(char *arg, char **env)
 {
+	char	*path;
 	char	**args;
-	char	*bin;
 
 	args = ft_split(arg, ' ');
-	if (!args || !args[0])
-		exit_error("empty command");
-	if (ft_strchr(args[0], '/'))
-		bin = ft_strdup(args[0]);
-	else
-		bin = find_bin(args[0], env);
-	if (!bin)
+	if (!args)
+		exit_error("split");
+	path = find_bin(args[0], env);
+	if (!path)
+	{
+		free_strs(args);
 		exit_error("command not found");
-	execve(bin, args, env);
-	exit_error("execve");
+	}
+	if (execve(path, args, env) == -1)
+	{
+		free(path);
+		free_strs(args);
+		exit_error("execve");
+	}
 }

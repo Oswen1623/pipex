@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 18:05:38 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/08 17:55:05 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/09 17:13:18 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,41 @@
 
 void	execute_cmd(int in, int out, char *cmd, char **env)
 {
-	if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
-		exit_error("dup2");
-	run_command(cmd, env);
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+		exit_error("fork");
+	if (pid == 0)
+	{
+		dup2(in, 0);
+		dup2(out, 1);
+		close(in);
+		close(out);
+		run_command(cmd, env);
+		exit_error("execve");
+	}
+	waitpid(pid, NULL, 0);
 }
 
 int	init_pipex(int ac, char **av, int *in_fd, int *out_fd)
 {
-	if (ac != 5)
-		return (ft_putstr_fd("Ex: ./pipex file1 cmd1 cmd2 file2\n", 2), 1);
-	*in_fd = open(av[1], O_RDONLY);
-	if (*in_fd < 0)
-		exit_error("infile");
-	*out_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (*out_fd < 0)
-		exit_error("outfile");
-	return (0);
+	int	file1;
+	int	file2;
+
+	file1 = open(av[1], O_RDONLY);
+	file2 = open(av[ac], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (file1 == -1 || file2 == -1)
+	{
+		exit_error("open");
+		return (1);
+	}
+	else
+	{
+		*in_fd = file1;
+		*out_fd = file2;
+		return (0);
+	}
 }
 
 int	main(int ac, char **av, char **env)

@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Couleurs
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
 # Bonus tests for pipex (multi-pipes and here_doc)
 
 TESTS_PASSED=0
@@ -16,16 +26,16 @@ run_test() {
   local expected_file="expected${test_num}.txt"
 
   TOTAL_TESTS=$((TOTAL_TESTS + 1))
-  echo "[B$test_num] $description"
+  printf "  ${MAGENTA}[B%-2s]${RESET} %-30s" "$test_num" "$description"
 
   eval "$pipex_cmd" 2>/dev/null || true
   eval "$shell_cmd" 2>/dev/null || true
 
   if diff "$output_file" "$expected_file" >/dev/null 2>&1; then
-    echo "PASS"
+    echo -e " ${GREEN}${BOLD}✓ PASS${RESET}"
     TESTS_PASSED=$((TESTS_PASSED + 1))
   else
-    echo "FAIL"
+    echo -e " ${RED}${BOLD}✗ FAIL${RESET}"
     TESTS_FAILED=$((TESTS_FAILED + 1))
   fi
 }
@@ -36,8 +46,14 @@ cleanup() {
 
 trap 'cleanup; exit 130' INT TERM
 
-echo "== Build"
+echo -e "${MAGENTA}${BOLD}╔═══════════════════════════════════════════╗${RESET}"
+echo -e "${MAGENTA}${BOLD}║         BONUS TESTS ⭐                   ║${RESET}"
+echo -e "${MAGENTA}${BOLD}╚═══════════════════════════════════════════╝${RESET}"
+echo ""
+printf "${YELLOW}⚙️  Building...${RESET}"
 make >/dev/null 2>&1 || make -C ../ >/dev/null 2>&1
+echo -e " ${GREEN}Done!${RESET}"
+echo ""
 
 cat > test_input.txt << EOF
 bonjour tout le monde
@@ -47,7 +63,8 @@ pour tester pipex
 un autre test
 EOF
 
-echo "== Bonus"
+echo -e "${YELLOW}${BOLD}📝 Running Tests:${RESET}"
+echo ""
 
 run_test 20 \
   "cat | grep test | wc -l" \
@@ -67,13 +84,12 @@ run_test 21 \
 ) | ./pipex here_doc LIMIT "cat" "wc -l" output22.txt 2>/dev/null || true
 echo -e "ligne 1\nligne 2" | cat | wc -l > expected22.txt 2>/dev/null
 TOTAL_TESTS=$((TOTAL_TESTS + 1))
+printf "  ${MAGENTA}[B%-2s]${RESET} %-30s" "22" "here_doc simple"
 if diff output22.txt expected22.txt >/dev/null 2>&1; then
-  echo "[B22] here_doc simple"
-  echo "PASS"
+  echo -e " ${GREEN}${BOLD}✓ PASS${RESET}"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
-  echo "[B22] here_doc simple"
-  echo "FAIL"
+  echo -e " ${RED}${BOLD}✗ FAIL${RESET}"
   TESTS_FAILED=$((TESTS_FAILED + 1))
 fi
 
@@ -91,18 +107,27 @@ rm -f output23.txt expected23.txt
   echo "b"
 } > expected23.txt
 TOTAL_TESTS=$((TOTAL_TESTS + 1))
+printf "  ${MAGENTA}[B%-2s]${RESET} %-30s" "23" "here_doc append"
 if diff output23.txt expected23.txt >/dev/null 2>&1; then
-  echo "[B23] here_doc append"
-  echo "PASS"
+  echo -e " ${GREEN}${BOLD}✓ PASS${RESET}"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
-  echo "[B23] here_doc append"
-  echo "FAIL"
+  echo -e " ${RED}${BOLD}✗ FAIL${RESET}"
   TESTS_FAILED=$((TESTS_FAILED + 1))
 fi
 
 cleanup
 
-echo "== Summary"
-echo "total=$TOTAL_TESTS pass=$TESTS_PASSED fail=$TESTS_FAILED"
+echo ""
+echo -e "${MAGENTA}${BOLD}╔═══════════════════════════════════════════╗${RESET}"
+echo -e "${MAGENTA}${BOLD}║           SUMMARY 📊                     ║${RESET}"
+echo -e "${MAGENTA}${BOLD}╚═══════════════════════════════════════════╝${RESET}"
+echo -e "  ${BOLD}Total:${RESET}  $TOTAL_TESTS tests"
+echo -e "  ${GREEN}${BOLD}Passed:${RESET} $TESTS_PASSED ✓${RESET}"
+echo -e "  ${RED}${BOLD}Failed:${RESET} $TESTS_FAILED ✗${RESET}"
+
+if [ "$TESTS_FAILED" -eq 0 ]; then
+  echo ""
+  echo -e "  ${GREEN}${BOLD}🎉 ALL BONUS TESTS PASSED! 🎉${RESET}"
+fi
 exit $([ "$TESTS_FAILED" -eq 0 ] && echo 0 || echo 1)
