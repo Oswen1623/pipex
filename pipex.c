@@ -6,72 +6,59 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 18:05:38 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/09 17:13:18 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/19 11:47:56 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	execute_cmd(int in, int out, char *cmd, char **env)
+void	handle_child_process(char **argv, char **envp, int *pipeline_fd)
 {
-	pid_t	pid;
+	int	fd_in;
 
-	pid = fork();
-	if (pid == -1)
-		exit_error("fork");
-	if (pid == 0)
-	{
-		dup2(in, 0);
-		dup2(out, 1);
-		close(in);
-		close(out);
-		run_command(cmd, env);
-		exit_error("execve");
-	}
-	waitpid(pid, NULL, 0);
+	fd_in = open(argv[1], O_RDONLY, 0777);
+	if (fd_in == -1)
+		handle_error();
+	dup2(pipeline_fd[1], STDOUT_FILENO);
+	dup2(fd_in, STDIN_FILENO);
+	close(pipeline_fd[0]);
+	run_command_executable(argv[2], envp);
 }
 
-int	init_pipex(int ac, char **av, int *in_fd, int *out_fd)
+void	handle_parent_process(char **argv, char **envp, int *pipeline_fd)
 {
-	int	file1;
-	int	file2;
+	int	fd_out;
 
-	file1 = open(av[1], O_RDONLY);
-	file2 = open(av[ac], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (file1 == -1 || file2 == -1)
+	fd_out = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (fd_out == -1)
+		handle_error();
+	dup2(pipeline_fd[0], STDIN_FILENO);
+	dup2(fd_out, STDOUT_FILENO);
+	close(pipeline_fd[1]);
+	run_command_executable(argv[3], envp);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	int		pipeline_fd[2];
+	pid_t	child_pid;
+
+	if (argc == 5)
 	{
-		exit_error("open");
-		return (1);
+		if (pipe(pipeline_fd) == -1)
+			handle_error();
+		child_pid = fork();
+		if (child_pid == -1)
+			handle_error();
+		if (child_pid == 0)
+			handle_child_process(argv, envp, pipeline_fd);
+		waitpid(child_pid, NULL, 0);
+		handle_parent_process(argv, envp, pipeline_fd);
 	}
 	else
 	{
-		*in_fd = file1;
-		*out_fd = file2;
-		return (0);
+		ft_putstr_fd("Error: Bad arguments\n", 2);
+		ft_putstr_fd("Ex: ./pipex <file1> <cmd1> <cmd2> <file2>\n", 1);
 	}
-}
-
-int	main(int ac, char **av, char **env)
-{
-	int		in_fd;
-	int		out_fd;
-	int		p[2];
-	pid_t	pid;
-
-	if (init_pipex(ac, av, &in_fd, &out_fd))
-		return (1);
-	if (pipe(p) == -1)
-		exit_error("pipe");
-	pid = fork();
-	if (pid == -1)
-		exit_error("fork");
-	if (pid == 0)
-	{
-		close(p[0]);
-		execute_cmd(in_fd, p[1], av[2], env);
-	}
-	close(p[1]);
-	waitpid(pid, NULL, 0);
-	execute_cmd(p[0], out_fd, av[3], env);
 	return (0);
 }

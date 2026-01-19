@@ -18,15 +18,12 @@ LIBFT_DIR := libft
 LIBFT   := $(LIBFT_DIR)/libft.a
 INCS    := -I. -I./$(LIBFT_DIR)
 
-# ----------------------------- Mandatory ----------------------------- #
 SRCS := \
 	pipex.c \
-	utils.c \
-	exec.c
+	utils.c
 
 OBJS := $(SRCS:.c=.o)
 
-# ----------------------------- Rules ----------------------------- #
 all: $(NAME)
 
 $(LIBFT):
