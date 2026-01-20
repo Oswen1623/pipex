@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 18:05:38 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/19 11:47:56 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/20 13:18:45 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,9 @@ int	main(int argc, char **argv, char **envp)
 	}
 	else
 	{
-		ft_putstr_fd("Error: Bad arguments\n", 2);
-		ft_putstr_fd("Ex: ./pipex <file1> <cmd1> <cmd2> <file2>\n", 1);
+		ft_putstr_fd("Error : Bad arguments\n", 2);
+		ft_putstr_fd("Correct use : ./pipex <file1> <cmd1> <cmd2> <file2>\n",
+			1);
 	}
 	return (0);
 }
