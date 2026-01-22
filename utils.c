@@ -6,23 +6,18 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/19 11:47:59 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/22 11:43:01 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*locate_command_executable(char *command, char **envp)
+static char	*search_in_paths(char **paths, char *command)
 {
-	char	**paths;
 	char	*path;
-	int		i;
 	char	*part;
+	int		i;
 
-	i = 0;
-	while (ft_strnstr(envp[i], "PATH", 4) == 0)
-		i++;
-	paths = ft_split(envp[i] + 5, ':');
 	i = 0;
 	while (paths[i])
 	{
@@ -34,26 +29,46 @@ char	*locate_command_executable(char *command, char **envp)
 		free(path);
 		i++;
 	}
+	return (0);
+}
+
+char	*check_in_path(char *command, char **envp)
+{
+	char	**paths;
+	char	*result;
+	int		i;
+
+	i = 0;
+	while (envp[i] && ft_strnstr(envp[i], "PATH", 4) == 0)
+		i++;
+	if (!envp[i])
+		return (0);
+	paths = ft_split(envp[i] + 5, ':');
+	result = search_in_paths(paths, command);
 	i = -1;
 	while (paths[++i])
 		free(paths[i]);
 	free(paths);
-	return (0);
+	return (result);
 }
 
-/*
-** A simple error displaying function.
-*/
+char	*locate_command_executable(char *command, char **envp)
+{
+	if (ft_strchr(command, '/') != NULL)
+	{
+		if (access(command, F_OK) == 0)
+			return (ft_strdup(command));
+		return (0);
+	}
+	return (check_in_path(command, envp));
+}
+
 void	handle_error(void)
 {
 	perror("Error");
 	exit(EXIT_FAILURE);
 }
 
-/*
-** Function that takes the command and sends it to locate_command_executable
-** before executing it.
-*/
 void	run_command_executable(char *argv, char **envp)
 {
 	char	**args;

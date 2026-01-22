@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 12:04:19 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/19 11:47:58 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/22 11:39:35 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,6 @@
 void	handle_error(void);
 void	run_command_executable(char *arg, char **env);
 char	*locate_command_executable(char *name, char **env);
+char	*check_in_path(char *command, char **envp);
 
 #endif
