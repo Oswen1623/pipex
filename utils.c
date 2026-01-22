@@ -6,7 +6,7 @@
 /*   By: lucinguy <lucinguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:38:05 by lucinguy          #+#    #+#             */
-/*   Updated: 2026/01/22 11:43:01 by lucinguy         ###   ########.fr       */
+/*   Updated: 2026/01/22 17:44:04 by lucinguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ char	*check_in_path(char *command, char **envp)
 		return (0);
 	paths = ft_split(envp[i] + 5, ':');
 	result = search_in_paths(paths, command);
-	i = -1;
-	while (paths[++i])
-		free(paths[i]);
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
 	free(paths);
 	return (result);
 }
